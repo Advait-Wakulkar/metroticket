@@ -4,8 +4,15 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss'
   ],
+  ssr: false,
   app: {
-    baseURL: '/metro/'
+    baseURL: '/metro/',
+    cdnURL: '/metro/'
+  },
+  nitro: {
+    prerender: {
+      routes: ['/']
+    }
   },
   css: ['~/assets/css/main.css']
 })
