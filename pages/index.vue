@@ -1,6 +1,5 @@
 <!-- pages/index.vue -->
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col font-sans">
   <div class="min-h-screen bg-gray-50 flex flex-col font-arial">
     <!-- Main content -->
     <div class="flex-1 px-8 py-16">
@@ -48,7 +47,6 @@
       <div class="w-36 h-1 bg-gray-300 rounded-full"></div>
     </div>
   </div>
-</div>
 </template>
 
 <script setup>
@@ -117,7 +115,7 @@ useHead({
 
 <style scoped>
 /* Additional responsive styles */
-@import 'https://cdn.tailwindcss.com';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
 * {
   font-family: system-ui, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
