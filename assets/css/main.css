@@ -1,3 +1,7 @@
 @tailwind base;
-@tailwind components; 
+@tailwind components;
 @tailwind utilities;
+
+* {
+  font-family: system-ui, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
