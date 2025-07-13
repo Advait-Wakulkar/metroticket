@@ -48,7 +48,7 @@
       <div class="w-36 h-1 bg-gray-300 rounded-full"></div>
     </div>
   </div>
-  /div>
+</div>
 </template>
 
 <script setup>
