@@ -5,5 +5,8 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss'
   ],
   ssr: false,
+  app: {
+    baseURL: '/metroticket/'
+  },
   css: ['~/assets/css/main.css']
 })
