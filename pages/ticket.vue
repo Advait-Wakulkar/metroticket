@@ -21,7 +21,6 @@
             </div>
         </div>
       </div>
-
       <!-- Real-time clock -->
       <div class="text-center mb-10">
         <div class="text-6xl font-bold text-gray-700 tracking-wider leading-tight">
