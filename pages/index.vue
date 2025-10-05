@@ -12,7 +12,7 @@
       <!-- Logo circle with screenshot -->
       <div class="flex justify-center mb-20">
         <div class="relative">
-            <div class="w-60 h-60 rounded-full bg-white flex items-center justify-center overflow-hidden">
+            <div ref="ticketEl" class="w-60 h-60 rounded-full bg-white flex items-center justify-center overflow-hidden ticket-anim">
               <img 
                 src="/logo.png" 
                 alt="Metro Transit Logo" 
@@ -56,6 +56,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 const currentTime = ref('')
 const expirationTime = ref('')
 let timeInterval = null
+const ticketEl = ref(null)
 
 // Function to update time
 const updateTime = () => {
@@ -98,12 +99,44 @@ onMounted(() => {
   updateTime() // Initial update
   updateExpirationTime() // Initial expiration time
   timeInterval = setInterval(updateTime, 1000) // Update every second
+
+  // Continuous, smooth breathing animation (no hard stops)
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (!prefersReduced && ticketEl.value) {
+    const periodMs = 2800 // cycle duration (slightly faster)
+    const amplitude = 0.10 // max +10% scale for a longer breath
+    let rafId
+    const start = performance.now()
+
+    const tick = (now) => {
+      const t = ((now - start) % periodMs) / periodMs // 0..1
+      // Smooth sinusoidal 0→1→0 via cos: y = (1 - cos(2πt)) / 2
+      const y = (1 - Math.cos(2 * Math.PI * t)) / 2
+      const scale = 1 + amplitude * y
+      // Subtle micro-rotation to avoid mechanical feel
+      const rot = 0.3 * Math.sin(2 * Math.PI * t) // degrees
+      // Glow strength tied to scale (soft at peaks)
+      const glow = 0.12 * y
+      ticketEl.value.style.transform = `translateZ(0) scale(${scale}) rotate(${rot}deg)`
+      ticketEl.value.style.boxShadow = `0 10px 24px 0 rgba(0, 82, 161, ${glow.toFixed(3)})`
+      rafId = requestAnimationFrame(tick)
+    }
+
+    rafId = requestAnimationFrame(tick)
+
+    // Store cancel on element for cleanup
+    ticketEl.value.__rafId = rafId
+  }
 })
 
 // Cleanup interval on unmount
 onUnmounted(() => {
   if (timeInterval) {
     clearInterval(timeInterval)
+  }
+  if (ticketEl.value && ticketEl.value.__rafId) {
+    cancelAnimationFrame(ticketEl.value.__rafId)
+    ticketEl.value.__rafId = undefined
   }
 })
 
@@ -119,6 +152,56 @@ useHead({
 
 * {
   font-family: system-ui, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Metro-activation-like pulse visuals; motion handled via JS for smooth loop */
+.ticket-anim {
+  position: relative;
+  will-change: transform, box-shadow;
+  transform-origin: center center;
+  box-shadow: 0 0 0 0 rgba(0, 82, 161, 0);
+}
+
+.ticket-anim::before {
+  /* Soft highlight that gently drifts to imply movement */
+  content: '';
+  position: absolute;
+  inset: -6%;
+  border-radius: inherit;
+  background: radial-gradient(120% 100% at 50% 30%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 35%, rgba(255,255,255,0) 60%);
+  pointer-events: none;
+  animation: drift 5200ms ease-in-out infinite alternate;
+}
+
+.ticket-anim::after {
+  /* Faint rotating color ring reminiscent of validator motion */
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg, rgba(0,82,161,0.12), rgba(200,16,46,0.12), rgba(0,82,161,0.12));
+  mix-blend-mode: multiply;
+  opacity: 0.18;
+  animation: spin 12s linear infinite;
+  pointer-events: none;
+}
+
+/* keyframes removed; transform driven in JS for continuous motion */
+
+@keyframes drift {
+  from { transform: translateY(-2%); }
+  to { transform: translateY(2%); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .ticket-anim { animation: none; box-shadow: none; }
+  .ticket-anim::before, .ticket-anim::after { animation: none; opacity: 0.08; }
 }
 
 @media (max-width: 640px) {
